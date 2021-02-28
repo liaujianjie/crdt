@@ -1,7 +1,16 @@
 class InvariantError extends Error {}
 
-export function invariant(condition: boolean, errorMessage: string) {
+/**
+ * Throws an `InvariantError` if `condition` is `false`.
+ */
+export const invariant: (
+  condition: boolean,
+  errorMessage?: string
+) => asserts condition is true = (
+  condition,
+  errorMessage = 'Invariant error encountered'
+) => {
   if (!condition) {
     throw new InvariantError(errorMessage);
   }
-}
+};
