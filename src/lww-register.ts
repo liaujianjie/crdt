@@ -18,6 +18,9 @@ interface LWWRegisterReplica<Data extends PrimitiveType>
   assign(data: Data): void;
 }
 
+/**
+ * Last-writer-wins register.
+ */
 export class LWWRegister<Data extends PrimitiveType>
   implements LWWRegisterReplica<Data> {
   readonly node: CrdtNode;

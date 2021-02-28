@@ -4,6 +4,9 @@ import {
   StateBasedCrdtReplica,
 } from './typings';
 
+/**
+ * Increment-only counter.
+ */
 interface GCounterPayload extends StateBasedCrdtPayload {
   /**
    * Map of all increments for each replica.

@@ -22,6 +22,9 @@ interface PNCounterReplica
   decrement(): void;
 }
 
+/**
+ * Positive-negative counter.
+ */
 export class PNCounter implements PNCounterReplica {
   readonly node: CrdtNode;
   payload: PNCounterPayload;
