@@ -8,20 +8,37 @@ interface GCounterPayload extends StateBasedCrdtPayload {
   /**
    * Map of all increments for each replica.
    */
-  counts: { [index in CrdtNode['id']]: number };
+  counts: { readonly [index in CrdtNode['id']]: number };
 }
 
-interface GCounterReplica extends StateBasedCrdtReplica<GCounterPayload> {
+interface GCounterQueryOps {
+  /**
+   * Returns the count of the counter.
+   */
+  getCount(): number;
+}
+
+interface GCounterUpdateOps {
   /**
    * Increases the count by 1.
    */
   increment(): void;
 }
 
+export interface ReadonlyGCounter
+  extends StateBasedCrdtReplica<GCounterPayload>,
+    Readonly<GCounterPayload>,
+    GCounterQueryOps {}
+
 /**
  * Increment-only counter.
  */
-export class GCounter implements GCounterReplica, GCounterPayload {
+export class GCounter
+  implements
+    GCounterPayload,
+    GCounterQueryOps,
+    GCounterUpdateOps,
+    StateBasedCrdtReplica<GCounterPayload> {
   readonly node: CrdtNode;
 
   // Payload
@@ -80,6 +97,9 @@ export class GCounter implements GCounterReplica, GCounterPayload {
   // Update ops
 
   increment() {
-    this.counts[this.node.id]++;
+    this.counts = {
+      ...this.counts,
+      [this.node.id]: this.counts[this.node.id] + 1,
+    };
   }
 }
