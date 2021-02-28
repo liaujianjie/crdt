@@ -10,8 +10,7 @@ interface PNCounterPayload extends StateBasedCrdtPayload {
   increments: GCounter;
 }
 
-interface PNCounterReplica
-  extends StateBasedCrdtReplica<PNCounterPayload, number> {
+interface PNCounterReplica extends StateBasedCrdtReplica<PNCounterPayload> {
   /**
    * Increases the count by 1.
    */
@@ -37,12 +36,6 @@ export class PNCounter implements PNCounterReplica {
     };
   }
 
-  getValue(): number {
-    return (
-      this.payload.increments.getValue() - this.payload.decrements.getValue()
-    );
-  }
-
   hasEqualPayload(otherPayload: PNCounterPayload): boolean {
     return (
       this.payload.decrements.hasEqualPayload(
@@ -56,6 +49,19 @@ export class PNCounter implements PNCounterReplica {
     this.payload.decrements.merge(otherPayload.decrements.payload);
     this.payload.increments.merge(otherPayload.increments.payload);
   }
+
+  // Query ops
+
+  /**
+   * Returns the count.
+   */
+  getCount(): number {
+    return (
+      this.payload.increments.getCount() - this.payload.decrements.getCount()
+    );
+  }
+
+  // Update ops
 
   increment() {
     this.payload.increments.increment();

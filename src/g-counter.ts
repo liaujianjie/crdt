@@ -16,8 +16,7 @@ interface GCounterPayload extends StateBasedCrdtPayload {
   };
 }
 
-interface GCounterReplica
-  extends StateBasedCrdtReplica<GCounterPayload, number> {
+interface GCounterReplica extends StateBasedCrdtReplica<GCounterPayload> {
   /**
    * Increases the count by 1.
    */
@@ -31,13 +30,6 @@ export class GCounter implements GCounterReplica {
   constructor(node: CrdtNode) {
     this.node = node;
     this.payload = { counts: { [this.node.id]: 0 } };
-  }
-
-  getValue(): number {
-    return Object.values(this.payload.counts).reduce(
-      (previousTotalCount, count) => previousTotalCount + count,
-      0
-    );
   }
 
   hasEqualPayload(otherPayload: GCounterPayload): boolean {
@@ -76,6 +68,17 @@ export class GCounter implements GCounterReplica {
       }, {}),
     };
   }
+
+  // Query ops
+
+  getCount(): number {
+    return Object.values(this.payload.counts).reduce(
+      (previousTotalCount, count) => previousTotalCount + count,
+      0
+    );
+  }
+
+  // Update ops
 
   increment() {
     this.payload.counts[this.node.id]++;

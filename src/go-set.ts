@@ -5,12 +5,6 @@ import {
   PrimitiveType,
 } from './typings';
 
-/**
- * Grow-only set.
- *
- * Note: Yes, this one is kind of a no brainer. I just wanted to see how it fits into the semantics
- *       of a CvRDT.
- */
 interface GOSetPayload<Element extends PrimitiveType>
   extends StateBasedCrdtPayload {
   /**
@@ -20,13 +14,19 @@ interface GOSetPayload<Element extends PrimitiveType>
 }
 
 interface GOSetReplica<Element extends PrimitiveType>
-  extends StateBasedCrdtReplica<GOSetPayload<Element>, Set<Element>> {
+  extends StateBasedCrdtReplica<GOSetPayload<Element>> {
   /**
    * Adds an element to the set.
    */
   add(element: Element): void;
 }
 
+/**
+ * Grow-only set.
+ *
+ * Note: Yes, this one is kind of a no brainer. I just wanted to see how it fits into the semantics
+ *       of a CvRDT.
+ */
 export class GOSet<Element extends PrimitiveType>
   implements GOSetReplica<Element> {
   readonly node: CrdtNode;
@@ -35,10 +35,6 @@ export class GOSet<Element extends PrimitiveType>
   constructor(node: CrdtNode, initialElements: Iterable<Element> = []) {
     this.node = node;
     this.payload = { set: new Set(initialElements) };
-  }
-
-  getValue(): Set<Element> {
-    return this.payload.set;
   }
 
   hasEqualPayload(otherPayload: GOSetPayload<Element>): boolean {
@@ -58,6 +54,14 @@ export class GOSet<Element extends PrimitiveType>
   merge(otherPayload: GOSetPayload<Element>) {
     this.payload = { set: new Set([...this.payload.set, ...otherPayload.set]) };
   }
+
+  // Query ops
+
+  has(element: Element): boolean {
+    return this.payload.set.has(element);
+  }
+
+  // Update ops
 
   add(element: Element) {
     this.payload = { set: new Set([...this.payload.set, element]) };

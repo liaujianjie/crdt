@@ -6,16 +6,16 @@ describe(GCounter, () => {
 
   it('should instantiate with value 0', () => {
     const replica = new GCounter(nodeA);
-    expect(replica.getValue()).toBe(0);
+    expect(replica.getCount()).toBe(0);
   });
 
   it('should increment correctly', () => {
     const replica = new GCounter(nodeA);
     replica.increment();
-    expect(replica.getValue()).toBe(1);
+    expect(replica.getCount()).toBe(1);
     replica.increment();
     replica.increment();
-    expect(replica.getValue()).toBe(3);
+    expect(replica.getCount()).toBe(3);
   });
 
   describe(GCounter.prototype.hasEqualPayload, () => {

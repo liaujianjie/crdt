@@ -13,7 +13,7 @@ interface LWWRegisterPayload<Data extends PrimitiveType>
 }
 
 interface LWWRegisterReplica<Data extends PrimitiveType>
-  extends StateBasedCrdtReplica<LWWRegisterPayload<Data>, Data> {
+  extends StateBasedCrdtReplica<LWWRegisterPayload<Data>> {
   assign(data: Data): void;
 }
 
@@ -34,10 +34,6 @@ export class LWWRegister<Data extends PrimitiveType>
     };
   }
 
-  getValue(): Data {
-    return this.payload.data;
-  }
-
   hasEqualPayload(otherPayload: LWWRegisterPayload<Data>): boolean {
     return (
       this.payload.data === otherPayload.data &&
@@ -56,6 +52,14 @@ export class LWWRegister<Data extends PrimitiveType>
 
     this.payload = { ...otherPayload };
   }
+
+  // Query ops
+
+  getValue(): Data {
+    return this.payload.data;
+  }
+
+  // Update ops
 
   assign(data: Data) {
     this.payload = {
