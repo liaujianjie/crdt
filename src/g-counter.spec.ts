@@ -58,4 +58,11 @@ describe(GCounter, () => {
       expect(replicaY.hasEqualPayload(replicaX.payload)).toBe(true);
     });
   });
+
+  describe(GCounter.prototype.merge, () => {
+    // TODO: write test cases for the properties...
+    // associative
+    // commutative
+    // idempotent
+  });
 });
