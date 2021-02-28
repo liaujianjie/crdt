@@ -23,7 +23,7 @@ describe(GCounter, () => {
       const replica = new GCounter(nodeA);
       replica.increment();
 
-      expect(replica.hasEqualPayload(replica.payload)).toBe(true);
+      expect(replica.hasEqualPayload(replica)).toBe(true);
     });
 
     it('should return false for different replicas that had never merged', () => {
@@ -32,7 +32,7 @@ describe(GCounter, () => {
       replicaX.increment();
       replicaY.increment();
 
-      expect(replicaX.hasEqualPayload(replicaY.payload)).toBe(false);
+      expect(replicaX.hasEqualPayload(replicaY)).toBe(false);
     });
 
     it('should return false for different replicas for which only one had merged', () => {
@@ -41,9 +41,9 @@ describe(GCounter, () => {
       replicaX.increment();
       replicaY.increment();
 
-      replicaX.merge(replicaY.payload);
-      expect(replicaX.hasEqualPayload(replicaY.payload)).toBe(false);
-      expect(replicaY.hasEqualPayload(replicaX.payload)).toBe(false);
+      replicaX.merge(replicaY);
+      expect(replicaX.hasEqualPayload(replicaY)).toBe(false);
+      expect(replicaY.hasEqualPayload(replicaX)).toBe(false);
     });
 
     it('should return false for different replicas when both are merged', () => {
@@ -52,10 +52,10 @@ describe(GCounter, () => {
       replicaX.increment();
       replicaY.increment();
 
-      replicaX.merge(replicaY.payload);
-      replicaY.merge(replicaX.payload);
-      expect(replicaX.hasEqualPayload(replicaY.payload)).toBe(true);
-      expect(replicaY.hasEqualPayload(replicaX.payload)).toBe(true);
+      replicaX.merge(replicaY);
+      replicaY.merge(replicaX);
+      expect(replicaX.hasEqualPayload(replicaY)).toBe(true);
+      expect(replicaY.hasEqualPayload(replicaX)).toBe(true);
     });
   });
 

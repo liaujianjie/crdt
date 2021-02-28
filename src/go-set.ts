@@ -28,21 +28,24 @@ interface GOSetReplica<Element extends PrimitiveType>
  *       of a CvRDT.
  */
 export class GOSet<Element extends PrimitiveType>
-  implements GOSetReplica<Element> {
+  implements GOSetReplica<Element>, GOSetPayload<Element> {
   readonly node: CrdtNode;
-  payload: GOSetPayload<Element>;
+
+  // Payload
+
+  set: Set<Element>;
 
   constructor(node: CrdtNode, initialElements: Iterable<Element> = []) {
     this.node = node;
-    this.payload = { set: new Set(initialElements) };
+    this.set = new Set(initialElements);
   }
 
   hasEqualPayload(otherPayload: GOSetPayload<Element>): boolean {
-    if (this.payload.set.size !== otherPayload.set.size) {
+    if (this.set.size !== otherPayload.set.size) {
       return false;
     }
 
-    for (const element of this.payload.set) {
+    for (const element of this.set) {
       if (!otherPayload.set.has(element)) {
         return false;
       }
@@ -52,18 +55,18 @@ export class GOSet<Element extends PrimitiveType>
   }
 
   merge(otherPayload: GOSetPayload<Element>) {
-    this.payload = { set: new Set([...this.payload.set, ...otherPayload.set]) };
+    this.set = new Set([...this.set, ...otherPayload.set]);
   }
 
   // Query ops
 
   has(element: Element): boolean {
-    return this.payload.set.has(element);
+    return this.set.has(element);
   }
 
   // Update ops
 
   add(element: Element) {
-    this.payload = { set: new Set([...this.payload.set, element]) };
+    this.set = new Set([...this.set, element]);
   }
 }

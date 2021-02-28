@@ -22,10 +22,6 @@ export interface StateBasedCrdtReplica<Payload extends StateBasedCrdtPayload> {
    */
   readonly node: CrdtNode;
   /**
-   * Current payload of the replica.
-   */
-  payload: Payload;
-  /**
    * Returns `true` if `otherPayload` is equals to the payload from `this` replica.
    */
   hasEqualPayload(otherPayload: Payload): boolean;

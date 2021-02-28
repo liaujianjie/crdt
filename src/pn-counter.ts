@@ -24,30 +24,30 @@ interface PNCounterReplica extends StateBasedCrdtReplica<PNCounterPayload> {
 /**
  * Positive-negative counter.
  */
-export class PNCounter implements PNCounterReplica {
+export class PNCounter implements PNCounterReplica, PNCounterPayload {
   readonly node: CrdtNode;
-  payload: PNCounterPayload;
+
+  // Payload
+
+  decrements: GCounter;
+  increments: GCounter;
 
   constructor(node: CrdtNode) {
     this.node = node;
-    this.payload = {
-      decrements: new GCounter(node),
-      increments: new GCounter(node),
-    };
+    this.decrements = new GCounter(node);
+    this.increments = new GCounter(node);
   }
 
   hasEqualPayload(otherPayload: PNCounterPayload): boolean {
     return (
-      this.payload.decrements.hasEqualPayload(
-        otherPayload.decrements.payload
-      ) &&
-      this.payload.increments.hasEqualPayload(otherPayload.increments.payload)
+      this.decrements.hasEqualPayload(otherPayload.decrements) &&
+      this.increments.hasEqualPayload(otherPayload.increments)
     );
   }
 
   merge(otherPayload: PNCounterPayload) {
-    this.payload.decrements.merge(otherPayload.decrements.payload);
-    this.payload.increments.merge(otherPayload.increments.payload);
+    this.decrements.merge(otherPayload.decrements);
+    this.increments.merge(otherPayload.increments);
   }
 
   // Query ops
@@ -56,18 +56,16 @@ export class PNCounter implements PNCounterReplica {
    * Returns the count.
    */
   getCount(): number {
-    return (
-      this.payload.increments.getCount() - this.payload.decrements.getCount()
-    );
+    return this.increments.getCount() - this.decrements.getCount();
   }
 
   // Update ops
 
   increment() {
-    this.payload.increments.increment();
+    this.increments.increment();
   }
 
   decrement() {
-    this.payload.decrements.increment();
+    this.decrements.increment();
   }
 }

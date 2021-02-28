@@ -11,9 +11,7 @@ interface GCounterPayload extends StateBasedCrdtPayload {
   /**
    * Map of all increments for each replica.
    */
-  readonly counts: {
-    [index in CrdtNode['id']]: number;
-  };
+  counts: { [index in CrdtNode['id']]: number };
 }
 
 interface GCounterReplica extends StateBasedCrdtReplica<GCounterPayload> {
@@ -23,17 +21,20 @@ interface GCounterReplica extends StateBasedCrdtReplica<GCounterPayload> {
   increment(): void;
 }
 
-export class GCounter implements GCounterReplica {
+export class GCounter implements GCounterReplica, GCounterPayload {
   readonly node: CrdtNode;
-  payload: GCounterPayload;
+
+  // Payload
+
+  counts: GCounterPayload['counts'];
 
   constructor(node: CrdtNode) {
     this.node = node;
-    this.payload = { counts: { [this.node.id]: 0 } };
+    this.counts = { [this.node.id]: 0 };
   }
 
   hasEqualPayload(otherPayload: GCounterPayload): boolean {
-    const thisIds = Object.keys(this.payload.counts);
+    const thisIds = Object.keys(this.counts);
     const otherIds = Object.keys(otherPayload.counts);
     if (thisIds.length !== otherIds.length) {
       return false;
@@ -42,7 +43,7 @@ export class GCounter implements GCounterReplica {
     // The counters are unequal as long as
     for (const nodeId in otherPayload.counts) {
       const otherCount = otherPayload.counts[nodeId];
-      const thisCount = this.payload.counts[nodeId];
+      const thisCount = this.counts[nodeId];
       if (otherCount !== thisCount) {
         return false;
       }
@@ -52,27 +53,25 @@ export class GCounter implements GCounterReplica {
   }
 
   merge(otherPayload: GCounterPayload) {
-    const thisKeys = Object.keys(this.payload.counts);
+    const thisKeys = Object.keys(this.counts);
     const otherKeys = Object.keys(otherPayload.counts);
     const keys = Array.from(new Set([...thisKeys, ...otherKeys]));
 
-    this.payload = {
-      counts: keys.reduce((previousPartialPayload, nodeId) => {
-        return {
-          ...previousPartialPayload,
-          [nodeId]: Math.max(
-            this.payload.counts[nodeId] ?? 0,
-            otherPayload.counts[nodeId] ?? 0
-          ),
-        };
-      }, {}),
-    };
+    this.counts = keys.reduce((previousPartialPayload, nodeId) => {
+      return {
+        ...previousPartialPayload,
+        [nodeId]: Math.max(
+          this.counts[nodeId] ?? 0,
+          otherPayload.counts[nodeId] ?? 0
+        ),
+      };
+    }, {});
   }
 
   // Query ops
 
   getCount(): number {
-    return Object.values(this.payload.counts).reduce(
+    return Object.values(this.counts).reduce(
       (previousTotalCount, count) => previousTotalCount + count,
       0
     );
@@ -81,6 +80,6 @@ export class GCounter implements GCounterReplica {
   // Update ops
 
   increment() {
-    this.payload.counts[this.node.id]++;
+    this.counts[this.node.id]++;
   }
 }

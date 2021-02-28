@@ -7,13 +7,16 @@ import {
 
 interface LWWRegisterPayload<Data extends PrimitiveType>
   extends StateBasedCrdtPayload {
-  readonly timestamp: Date;
-  readonly nodeId: string;
-  readonly data: Data;
+  timestamp: Date;
+  nodeId: string;
+  data: Data;
 }
 
 interface LWWRegisterReplica<Data extends PrimitiveType>
   extends StateBasedCrdtReplica<LWWRegisterPayload<Data>> {
+  /**
+   * Assgins a new value to the register.
+   */
   assign(data: Data): void;
 }
 
@@ -21,51 +24,57 @@ interface LWWRegisterReplica<Data extends PrimitiveType>
  * Last-writer-wins register.
  */
 export class LWWRegister<Data extends PrimitiveType>
-  implements LWWRegisterReplica<Data> {
+  implements LWWRegisterReplica<Data>, LWWRegisterPayload<Data> {
   readonly node: CrdtNode;
-  payload: LWWRegisterPayload<Data>;
+
+  // Payload
+
+  timestamp: Date;
+  nodeId: string;
+  data: Data;
 
   constructor(node: CrdtNode, initialData: Data) {
     this.node = node;
-    this.payload = {
-      timestamp: new Date(),
-      nodeId: node.id,
-      data: initialData,
-    };
+    this.timestamp = new Date();
+    this.nodeId = node.id;
+    this.data = initialData;
   }
 
   hasEqualPayload(otherPayload: LWWRegisterPayload<Data>): boolean {
     return (
-      this.payload.data === otherPayload.data &&
-      this.payload.nodeId === otherPayload.nodeId &&
-      this.payload.timestamp === otherPayload.timestamp
+      this.data === otherPayload.data &&
+      this.nodeId === otherPayload.nodeId &&
+      this.timestamp === otherPayload.timestamp
     );
   }
 
   merge(otherPayload: LWWRegisterPayload<Data>) {
     if (
-      this.payload.timestamp > otherPayload.timestamp ||
-      this.payload.nodeId > otherPayload.nodeId
+      this.timestamp > otherPayload.timestamp ||
+      this.nodeId > otherPayload.nodeId
     ) {
       return;
     }
 
-    this.payload = { ...otherPayload };
+    this.timestamp = otherPayload.timestamp;
+    this.nodeId = otherPayload.nodeId;
+    this.data = otherPayload.data;
   }
 
   // Query ops
 
+  /**
+   * Returns the value of the register.
+   */
   getValue(): Data {
-    return this.payload.data;
+    return this.data;
   }
 
   // Update ops
 
   assign(data: Data) {
-    this.payload = {
-      nodeId: this.node.id,
-      timestamp: new Date(),
-      data,
-    };
+    this.nodeId = this.node.id;
+    this.timestamp = new Date();
+    this.data = data;
   }
 }
