@@ -3,6 +3,7 @@ import {
   StateBasedCrdtPayload,
   StateBasedCrdtReplica,
 } from './typings';
+import { invariant } from './utils/invariant';
 
 interface LWWRegisterPayload<Value extends PrimitiveType>
   extends StateBasedCrdtPayload {
@@ -61,13 +62,22 @@ export class LWWRegister<Value extends PrimitiveType>
   }
 
   merge(otherPayload: LWWRegisterPayload<Value>) {
+    // Partially guard against byzantine nodes.
+    invariant(
+      otherPayload.timestamp <= new Date(),
+      'Cannot merge payload from the future.'
+    );
+
+    // Do nothing if the other payload is less recent than the payload from this replica.
     if (
       this.timestamp > otherPayload.timestamp ||
+      // For completeness
       this.writerReplicaId > otherPayload.writerReplicaId
     ) {
       return;
     }
 
+    // Otherwise, update payload.
     this.timestamp = otherPayload.timestamp;
     this.writerReplicaId = otherPayload.writerReplicaId;
     this.value = otherPayload.value;
