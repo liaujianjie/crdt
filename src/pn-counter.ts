@@ -72,10 +72,20 @@ export class PNCounter implements PNCounterReplica, PNCounterPayload {
   // Update ops
 
   increment() {
-    this.increments.increment();
+    const newIncrementsCounter = new GCounter(
+      this.node,
+      this.increments.getCount()
+    );
+    newIncrementsCounter.increment();
+    this.increments = newIncrementsCounter;
   }
 
   decrement() {
-    this.decrements.increment();
+    const newDecrementsCounter = new GCounter(
+      this.node,
+      this.decrements.getCount()
+    );
+    newDecrementsCounter.increment();
+    this.decrements = newDecrementsCounter;
   }
 }
