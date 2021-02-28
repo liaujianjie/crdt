@@ -42,3 +42,5 @@ export interface StateBasedCrdtReplica<
    */
   merge(otherPayload: Payload): void;
 }
+
+export type PrimitiveType = string | number | null | undefined;

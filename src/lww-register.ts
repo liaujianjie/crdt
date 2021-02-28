@@ -1,10 +1,9 @@
 import {
   CrdtNode,
+  PrimitiveType,
   StateBasedCrdtPayload,
   StateBasedCrdtReplica,
 } from './typings';
-
-type PrimitiveType = string | number | null | undefined;
 
 interface LWWRegisterPayload<Data extends PrimitiveType>
   extends StateBasedCrdtPayload {
