@@ -1,4 +1,4 @@
-import { GCounter } from './g-counter';
+import { GCounter, ReadonlyGCounter } from './g-counter';
 import {
   StateBasedCrdtPayload,
   CrdtNode,
@@ -6,11 +6,18 @@ import {
 } from './typings';
 
 interface PNCounterPayload extends StateBasedCrdtPayload {
-  decrements: GCounter;
-  increments: GCounter;
+  decrements: ReadonlyGCounter;
+  increments: ReadonlyGCounter;
 }
 
-interface PNCounterReplica extends StateBasedCrdtReplica<PNCounterPayload> {
+interface PNCounterQueryOps {
+  /**
+   * Returns the count.
+   */
+  getCount(): number;
+}
+
+interface PNCounterUpdateOps {
   /**
    * Increases the count by 1.
    */
@@ -21,16 +28,26 @@ interface PNCounterReplica extends StateBasedCrdtReplica<PNCounterPayload> {
   decrement(): void;
 }
 
+export interface ReadonlyPNCounter
+  extends StateBasedCrdtReplica<PNCounterPayload>,
+    Readonly<PNCounterPayload>,
+    PNCounterQueryOps {}
+
 /**
- * Positive-negative counter.
+ * Positive-negative counter. Implemented with `GCounter`.
  */
-export class PNCounter implements PNCounterReplica, PNCounterPayload {
+export class PNCounter
+  implements
+    PNCounterPayload,
+    PNCounterQueryOps,
+    PNCounterUpdateOps,
+    StateBasedCrdtReplica<PNCounterPayload> {
   readonly node: CrdtNode;
 
   // Payload
 
-  increments: GCounter;
-  decrements: GCounter;
+  increments: ReadonlyGCounter;
+  decrements: ReadonlyGCounter;
 
   constructor(node: CrdtNode, initialIncrements = 0, initialDecrements = 0) {
     this.node = node;
