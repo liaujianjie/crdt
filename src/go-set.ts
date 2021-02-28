@@ -21,6 +21,9 @@ interface GOSetPayload<Element extends PrimitiveType>
 
 interface GOSetReplica<Element extends PrimitiveType>
   extends StateBasedCrdtReplica<GOSetPayload<Element>, Set<Element>> {
+  /**
+   * Adds an element to the set.
+   */
   add(element: Element): void;
 }
 
@@ -29,9 +32,9 @@ export class GOSet<Element extends PrimitiveType>
   readonly node: CrdtNode;
   payload: GOSetPayload<Element>;
 
-  constructor(node: CrdtNode) {
+  constructor(node: CrdtNode, initialElements: Iterable<Element> = []) {
     this.node = node;
-    this.payload = { set: new Set() };
+    this.payload = { set: new Set(initialElements) };
   }
 
   getValue(): Set<Element> {
