@@ -29,25 +29,35 @@ export class PNCounter implements PNCounterReplica, PNCounterPayload {
 
   // Payload
 
-  decrements: GCounter;
   increments: GCounter;
+  decrements: GCounter;
 
-  constructor(node: CrdtNode) {
+  constructor(node: CrdtNode, initialIncrements = 0, initialDecrements = 0) {
     this.node = node;
-    this.decrements = new GCounter(node);
-    this.increments = new GCounter(node);
+    this.decrements = new GCounter(node, initialDecrements);
+    this.increments = new GCounter(node, initialIncrements);
   }
 
   hasEqualPayload(otherPayload: PNCounterPayload): boolean {
     return (
-      this.decrements.hasEqualPayload(otherPayload.decrements) &&
-      this.increments.hasEqualPayload(otherPayload.increments)
+      this.increments.hasEqualPayload(otherPayload.increments) &&
+      this.decrements.hasEqualPayload(otherPayload.decrements)
     );
   }
 
   merge(otherPayload: PNCounterPayload) {
-    this.decrements.merge(otherPayload.decrements);
-    this.increments.merge(otherPayload.increments);
+    const newIncrementsCounter = new GCounter(
+      this.node,
+      this.increments.getCount()
+    );
+    const newDecrementsCounter = new GCounter(
+      this.node,
+      this.decrements.getCount()
+    );
+    newIncrementsCounter.merge(otherPayload.increments);
+    newDecrementsCounter.merge(otherPayload.decrements);
+    this.increments = newIncrementsCounter;
+    this.decrements = newDecrementsCounter;
   }
 
   // Query ops
