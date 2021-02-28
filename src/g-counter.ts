@@ -1,14 +1,10 @@
-import {
-  StateBasedCrdtPayload,
-  CrdtNode,
-  StateBasedCrdtReplica,
-} from './typings';
+import { StateBasedCrdtPayload, StateBasedCrdtReplica } from './typings';
 
 interface GCounterPayload extends StateBasedCrdtPayload {
   /**
    * Map of all increments for each replica.
    */
-  counts: { readonly [index in CrdtNode['id']]: number };
+  counts: { readonly [replicaId: string]: number };
 }
 
 interface GCounterQueryOps {
@@ -35,19 +31,19 @@ export interface ReadonlyGCounter
  */
 export class GCounter
   implements
+    StateBasedCrdtReplica<GCounterPayload>,
     GCounterPayload,
     GCounterQueryOps,
-    GCounterUpdateOps,
-    StateBasedCrdtReplica<GCounterPayload> {
-  readonly node: CrdtNode;
+    GCounterUpdateOps {
+  readonly replicaId: string;
 
   // Payload
 
   counts: GCounterPayload['counts'];
 
-  constructor(node: CrdtNode, initialCount = 0) {
-    this.node = node;
-    this.counts = { [this.node.id]: initialCount };
+  constructor(node: string, initialCount = 0) {
+    this.replicaId = node;
+    this.counts = { [this.replicaId]: initialCount };
   }
 
   hasEqualPayload(otherPayload: GCounterPayload): boolean {
@@ -99,7 +95,7 @@ export class GCounter
   increment() {
     this.counts = {
       ...this.counts,
-      [this.node.id]: this.counts[this.node.id] + 1,
+      [this.replicaId]: this.counts[this.replicaId] + 1,
     };
   }
 }

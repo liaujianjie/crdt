@@ -1,9 +1,5 @@
 import { GCounter, ReadonlyGCounter } from './g-counter';
-import {
-  StateBasedCrdtPayload,
-  CrdtNode,
-  StateBasedCrdtReplica,
-} from './typings';
+import { StateBasedCrdtPayload, StateBasedCrdtReplica } from './typings';
 
 interface PNCounterPayload extends StateBasedCrdtPayload {
   decrements: ReadonlyGCounter;
@@ -38,19 +34,19 @@ export interface ReadonlyPNCounter
  */
 export class PNCounter
   implements
+    StateBasedCrdtReplica<PNCounterPayload>,
     PNCounterPayload,
     PNCounterQueryOps,
-    PNCounterUpdateOps,
-    StateBasedCrdtReplica<PNCounterPayload> {
-  readonly node: CrdtNode;
+    PNCounterUpdateOps {
+  readonly replicaId: string;
 
   // Payload
 
   increments: ReadonlyGCounter;
   decrements: ReadonlyGCounter;
 
-  constructor(node: CrdtNode, initialIncrements = 0, initialDecrements = 0) {
-    this.node = node;
+  constructor(node: string, initialIncrements = 0, initialDecrements = 0) {
+    this.replicaId = node;
     this.decrements = new GCounter(node, initialDecrements);
     this.increments = new GCounter(node, initialIncrements);
   }
@@ -64,11 +60,11 @@ export class PNCounter
 
   merge(otherPayload: PNCounterPayload) {
     const newIncrementsCounter = new GCounter(
-      this.node,
+      this.replicaId,
       this.increments.getCount()
     );
     const newDecrementsCounter = new GCounter(
-      this.node,
+      this.replicaId,
       this.decrements.getCount()
     );
     newIncrementsCounter.merge(otherPayload.increments);
@@ -79,9 +75,6 @@ export class PNCounter
 
   // Query ops
 
-  /**
-   * Returns the count.
-   */
   getCount(): number {
     return this.increments.getCount() - this.decrements.getCount();
   }
@@ -90,7 +83,7 @@ export class PNCounter
 
   increment() {
     const newIncrementsCounter = new GCounter(
-      this.node,
+      this.replicaId,
       this.increments.getCount()
     );
     newIncrementsCounter.increment();
@@ -99,7 +92,7 @@ export class PNCounter
 
   decrement() {
     const newDecrementsCounter = new GCounter(
-      this.node,
+      this.replicaId,
       this.decrements.getCount()
     );
     newDecrementsCounter.increment();

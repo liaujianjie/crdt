@@ -1,5 +1,4 @@
 import {
-  CrdtNode,
   PrimitiveType,
   StateBasedCrdtPayload,
   StateBasedCrdtReplica,
@@ -7,13 +6,22 @@ import {
 
 interface LWWRegisterPayload<Value extends PrimitiveType>
   extends StateBasedCrdtPayload {
+  /**
+   * Data
+   */
   timestamp: Date;
-  nodeId: string;
+  writerReplicaId: string;
   value: Value;
 }
 
-interface LWWRegisterReplica<Value extends PrimitiveType>
-  extends StateBasedCrdtReplica<LWWRegisterPayload<Value>> {
+interface LWWRegisterQueryOps<Value extends PrimitiveType> {
+  /**
+   * Returns the value of the register.
+   */
+  getValue(): Value;
+}
+
+interface LWWRegisterUpdateOps<Value extends PrimitiveType> {
   /**
    * Assgins a new value to the register.
    */
@@ -24,26 +32,30 @@ interface LWWRegisterReplica<Value extends PrimitiveType>
  * Last-writer-wins register.
  */
 export class LWWRegister<Value extends PrimitiveType>
-  implements LWWRegisterReplica<Value>, LWWRegisterPayload<Value> {
-  readonly node: CrdtNode;
+  implements
+    StateBasedCrdtReplica<LWWRegisterPayload<Value>>,
+    LWWRegisterQueryOps<Value>,
+    LWWRegisterUpdateOps<Value>,
+    LWWRegisterPayload<Value> {
+  readonly replicaId: string;
 
   // Payload
 
   timestamp: Date;
-  nodeId: string;
+  writerReplicaId: string;
   value: Value;
 
-  constructor(node: CrdtNode, initialValue: Value) {
-    this.node = node;
+  constructor(node: string, initialValue: Value) {
+    this.replicaId = node;
     this.timestamp = new Date();
-    this.nodeId = node.id;
+    this.writerReplicaId = node;
     this.value = initialValue;
   }
 
   hasEqualPayload(otherPayload: LWWRegisterPayload<Value>): boolean {
     return (
       this.value === otherPayload.value &&
-      this.nodeId === otherPayload.nodeId &&
+      this.writerReplicaId === otherPayload.writerReplicaId &&
       this.timestamp === otherPayload.timestamp
     );
   }
@@ -51,21 +63,18 @@ export class LWWRegister<Value extends PrimitiveType>
   merge(otherPayload: LWWRegisterPayload<Value>) {
     if (
       this.timestamp > otherPayload.timestamp ||
-      this.nodeId > otherPayload.nodeId
+      this.writerReplicaId > otherPayload.writerReplicaId
     ) {
       return;
     }
 
     this.timestamp = otherPayload.timestamp;
-    this.nodeId = otherPayload.nodeId;
+    this.writerReplicaId = otherPayload.writerReplicaId;
     this.value = otherPayload.value;
   }
 
   // Query ops
 
-  /**
-   * Returns the value of the register.
-   */
   getValue(): Value {
     return this.value;
   }
@@ -73,7 +82,7 @@ export class LWWRegister<Value extends PrimitiveType>
   // Update ops
 
   assign(newValue: Value) {
-    this.nodeId = this.node.id;
+    this.writerReplicaId = this.replicaId;
     this.timestamp = new Date();
     this.value = newValue;
   }

@@ -1,14 +1,4 @@
 /**
- * Represents a unique client.
- */
-export interface CrdtNode {
-  /**
-   * Globally unique identifier.
-   */
-  readonly id: string;
-}
-
-/**
  * Payload for a CvRDT system. The payload is sent between replicas.
  */
 export interface StateBasedCrdtPayload {}
@@ -20,7 +10,7 @@ export interface StateBasedCrdtReplica<Payload extends StateBasedCrdtPayload> {
   /**
    * Node that controls the replica.
    */
-  readonly node: CrdtNode;
+  readonly replicaId: string;
   /**
    * Returns `true` if `otherPayload` is equals to the payload from `this` replica.
    */

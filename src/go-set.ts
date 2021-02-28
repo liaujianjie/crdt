@@ -1,6 +1,5 @@
 import {
   StateBasedCrdtPayload,
-  CrdtNode,
   StateBasedCrdtReplica,
   PrimitiveType,
 } from './typings';
@@ -13,8 +12,14 @@ interface GOSetPayload<Element extends PrimitiveType>
   readonly set: Set<Element>;
 }
 
-interface GOSetReplica<Element extends PrimitiveType>
-  extends StateBasedCrdtReplica<GOSetPayload<Element>> {
+interface GOSetQueryOps<Element extends PrimitiveType> {
+  /**
+   * Returns `true` if the set contains `element`.
+   */
+  has(element: Element): boolean;
+}
+
+interface GOSetUpdateOps<Element extends PrimitiveType> {
   /**
    * Adds an element to the set.
    */
@@ -24,19 +29,23 @@ interface GOSetReplica<Element extends PrimitiveType>
 /**
  * Grow-only set.
  *
- * Note: Yes, this one is kind of a no brainer. I just wanted to see how it fits into the semantics
+ * Note: Yes, this one is kind of a no-brainer. I just wanted to see how it fits into the semantics
  *       of a CvRDT.
  */
 export class GOSet<Element extends PrimitiveType>
-  implements GOSetReplica<Element>, GOSetPayload<Element> {
-  readonly node: CrdtNode;
+  implements
+    StateBasedCrdtReplica<GOSetPayload<Element>>,
+    GOSetQueryOps<Element>,
+    GOSetUpdateOps<Element>,
+    GOSetPayload<Element> {
+  readonly replicaId: string;
 
   // Payload
 
   set: Set<Element>;
 
-  constructor(node: CrdtNode, initialElements: Iterable<Element> = []) {
-    this.node = node;
+  constructor(node: string, initialElements: Iterable<Element> = []) {
+    this.replicaId = node;
     this.set = new Set(initialElements);
   }
 
