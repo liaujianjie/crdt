@@ -1,15 +1,24 @@
-import { GrowOnlySetUtils } from './grow-only-set';
+import { TwoPhaseSetUtils } from './two-phase-set';
 
-describe('grow-only-set', () => {
-  const { getInitialPayload, merge, compare, add, has } = GrowOnlySetUtils;
+describe('two-phase-set', () => {
+  const {
+    getInitialPayload,
+    merge,
+    compare,
+    add,
+    remove,
+    has,
+  } = TwoPhaseSetUtils;
 
-  describe(GrowOnlySetUtils.getInitialPayload, () => {
-    it('should return empty set', () => {
-      expect(getInitialPayload('payload_x').content.size).toEqual(0);
+  describe(TwoPhaseSetUtils.getInitialPayload, () => {
+    it('should return empty added and removed sets', () => {
+      const a = getInitialPayload('payload_x');
+      expect(a.content.added.content.size).toEqual(0);
+      expect(a.content.removed.content.size).toEqual(0);
     });
   });
 
-  describe(GrowOnlySetUtils.merge, () => {
+  describe(TwoPhaseSetUtils.merge, () => {
     it('should throw if payloads have different identities', () => {
       const a = getInitialPayload('payload_x');
       const b = getInitialPayload('payload_y');
@@ -18,7 +27,7 @@ describe('grow-only-set', () => {
 
     it('should be commutative', () => {
       const a = add(getInitialPayload('payload_x'), 'meow');
-      const b = add(getInitialPayload('payload_x'), 'woof');
+      const b = remove(add(getInitialPayload('payload_x'), 'woof'), 'woof');
 
       const mergedAB = merge(a, b);
       const mergedBA = merge(b, a);
@@ -31,7 +40,7 @@ describe('grow-only-set', () => {
 
     it('should be associative', () => {
       const a = add(getInitialPayload('payload_x'), 'meow');
-      const b = add(getInitialPayload('payload_x'), 'woof');
+      const b = remove(add(getInitialPayload('payload_x'), 'woof'), 'woof');
       const c = add(getInitialPayload('payload_x'), 'skrt');
 
       const mergedABThenC = merge(merge(a, b), c);
@@ -45,7 +54,7 @@ describe('grow-only-set', () => {
 
     it('should be idempotent', () => {
       const a = add(getInitialPayload('payload_x'), 'meow');
-      const b = add(getInitialPayload('payload_x'), 'woof');
+      const b = remove(add(getInitialPayload('payload_x'), 'woof'), 'woof');
 
       const mergedAB = merge(a, b);
       const mergedABThenA = merge(merge(b, a), a);
@@ -59,7 +68,7 @@ describe('grow-only-set', () => {
     });
   });
 
-  describe(GrowOnlySetUtils.compare, () => {
+  describe(TwoPhaseSetUtils.compare, () => {
     it('should throw if payloads have different identities', () => {
       const aX = getInitialPayload('payload_x');
       const aY = getInitialPayload('payload_y');
@@ -81,19 +90,43 @@ describe('grow-only-set', () => {
       const a = getInitialPayload('payload_x');
       const b = add(getInitialPayload('payload_x'), 'woof');
       expect(compare(a, b)).toBe(false);
+
+      const c = remove(add(getInitialPayload('payload_x'), 'woof'), 'woof');
+      expect(compare(a, c)).toBe(false);
     });
   });
 
-  describe(GrowOnlySetUtils.add, () => {
+  describe(TwoPhaseSetUtils.add, () => {
     it('should add element', () => {
       const a = getInitialPayload('payload_x');
-      expect(has(a, 'meow')).toBe(false);
       expect(has(add(a, 'meow'), 'meow')).toBe(true);
+    });
+
+    it('should not add element if it has been removed before', () => {
+      const a = remove(add(getInitialPayload('payload_x'), 'meow'), 'meow');
+      expect(has(add(a, 'meow'), 'meow')).toBe(false);
     });
 
     it('should be equal when adding an already-added element', () => {
       const a = add(getInitialPayload('payload_x'), 'meow');
       expect(compare(a, add(a, 'meow'))).toBe(true);
+    });
+  });
+
+  describe(TwoPhaseSetUtils.remove, () => {
+    it('should throw if element has not been added yet', () => {
+      const a = getInitialPayload('payload_x');
+      expect(() => remove(a, 'meow')).toThrow();
+    });
+
+    it('should remove element', () => {
+      const a = add(getInitialPayload('payload_x'), 'meow');
+      expect(has(remove(a, 'meow'), 'meow')).toBe(false);
+    });
+
+    it('should be equal when removing an already-removed element', () => {
+      const a = remove(add(getInitialPayload('payload_x'), 'meow'), 'meow');
+      expect(compare(a, remove(a, 'meow'))).toBe(true);
     });
   });
 });
