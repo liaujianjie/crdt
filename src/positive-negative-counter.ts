@@ -32,7 +32,9 @@ export interface PositiveNegativeCounterQueryOperations {
 interface PositiveNegativeCounterUtils
   extends CvrdtSpecification<PositiveNegativeCounterPayload>,
     PositiveNegativeCounterUpdateOperations,
-    PositiveNegativeCounterQueryOperations {}
+    PositiveNegativeCounterQueryOperations {
+  getInitialPayload(payloadId: string): PositiveNegativeCounterPayload;
+}
 
 export const PositiveNegativeCounterUtils: PositiveNegativeCounterUtils = {
   getInitialPayload(payloadId) {

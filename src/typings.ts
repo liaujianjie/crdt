@@ -47,8 +47,6 @@ export interface CrdtProcess<Content> {
  *       synchronously.
  */
 export interface CvrdtSpecification<Payload extends CrdtPayload<unknown>> {
-  getInitialPayload(payloadId: string): Payload;
-
   /**
    * Returns `true` if payloads `a` and `b` have equivalent abstract states.
    */

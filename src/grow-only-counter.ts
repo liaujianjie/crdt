@@ -26,7 +26,9 @@ export interface GrowOnlyCounterQueryOperations {
 interface GrowOnlyCounterUtils
   extends CvrdtSpecification<GrowOnlyCounterPayload>,
     GrowOnlyCounterUpdateOperations,
-    GrowOnlyCounterQueryOperations {}
+    GrowOnlyCounterQueryOperations {
+  getInitialPayload(payloadId: string): GrowOnlyCounterPayload;
+}
 
 export const GrowOnlyCounterUtils: GrowOnlyCounterUtils = {
   getInitialPayload(payloadId) {
