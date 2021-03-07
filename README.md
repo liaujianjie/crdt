@@ -4,7 +4,9 @@ This repo implements some of the CvRDTs described in [A comprehensive study of C
 Commutative Replicated Data Types (2011)](https://hal.inria.fr/inria-00555588/).
 
 I will be using this space to experiment with CvRDTs and build basic TypeScript code infrastructure
-for developing more CvRDTs (e.g. standardized way of testing).
+(e.g. standardized way of testing) for developing more CvRDTs.
+
+Anyone is welcome to participate. :-)
 
 ## Design goals
 
