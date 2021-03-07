@@ -15,6 +15,8 @@ Anyone is welcome to participate. :-)
 
 - Develop a consistent structure for composing new CvRDTs from other CvRDTs.
 
+- Payload should be immutable, and as such update operations should not mutate the payloads.
+
 - Full test coverage:
 
   - State equivalence - `a` and `b` have equivalent abstract states if all query operation return
@@ -25,20 +27,20 @@ Anyone is welcome to participate. :-)
 
   - Merging operation has to be eventually consistent.
 
-    1. Associative - operations can be group abitrarily
-
-       ```ts
-       merge(merge(a, b), c) === merge(a, merge(b, c));
-       ```
-
-    2. Commutative - operations can be ordered arbitrarily
+    1. Commutative - operations can be ordered arbitrarily
 
        ```ts
        merge(a, b) === merge(b, a);
        ```
 
+    2. Associative - operations can be group abitrarily
+
+       ```ts
+       merge(merge(a, b), c) === merge(a, merge(b, c));
+       ```
+
     3. Idempotent - operations can be applied multiple times without changes the result
 
        ```ts
-       (merge(a, merge(a, b)) === merge(merge(a, b), b)) === merge(a, b);
+       (merge(merge(a, b), a) === merge(merge(a, b), b)) === merge(a, b);
        ```

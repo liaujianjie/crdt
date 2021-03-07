@@ -42,9 +42,12 @@ export interface CrdtProcess<Content> {
 /**
  * Base specification for a **CvRDT**. Concrete specifications should also implement the update and
  * query operations, including their precondition checks.
+ *
+ * Note: Update and query operations should be immutable, have no side-effects and execute
+ *       synchronously.
  */
 export interface CvrdtSpecification<Payload extends CrdtPayload<unknown>> {
-  // Payload is not included.
+  getInitialPayload(payloadId: string): Payload;
 
   /**
    * Returns `true` if payloads `a` and `b` have equivalent abstract states.
@@ -52,7 +55,7 @@ export interface CvrdtSpecification<Payload extends CrdtPayload<unknown>> {
   compare(a: Payload, b: Payload): boolean;
 
   /**
-   * Merges payloads `a` and `b` and returns a least upper bound payload.
+   * Immutably merges payloads `a` and `b` and returns a least upper bound payload.
    */
   merge(a: Payload, b: Payload): Payload;
 }

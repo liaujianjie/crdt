@@ -1,4 +1,4 @@
-class InvariantError extends Error {}
+export class InvariantError extends Error {}
 
 /**
  * Throws an `InvariantError` if `condition` is `false`.
@@ -8,7 +8,7 @@ export const invariant: (
   errorMessage?: string
 ) => asserts condition is true = (
   condition,
-  errorMessage = 'Invariant error encountered'
+  errorMessage = 'Invariant error encountered.'
 ) => {
   if (!condition) {
     throw new InvariantError(errorMessage);
