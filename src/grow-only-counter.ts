@@ -29,7 +29,7 @@ interface GrowOnlyCounterUtils
     GrowOnlyCounterQueryOperations {}
 
 export const GrowOnlyCounterUtils: GrowOnlyCounterUtils = {
-  getInitialPayload(payloadId: string) {
+  getInitialPayload(payloadId) {
     return { id: payloadId, content: {} };
   },
 
