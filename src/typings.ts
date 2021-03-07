@@ -34,6 +34,17 @@ export type CrdtAtom<Element = unknown> =
   | undefined;
 
 export type CrdtObject<Identity, Payload> = {
-  id: Identity;
-  content: Payload;
+  identity: Identity;
+  payload: Payload;
+};
+
+export type CrdtProcess<Identity, Payload> = {
+  /**
+   * Globally unique identifier to uniquely identity the process in a network of processes.
+   */
+  id: string;
+  /**
+   * Local replica of the CRDT.
+   */
+  replica: CrdtObject<Identity, Payload>;
 };

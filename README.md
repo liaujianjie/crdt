@@ -15,8 +15,8 @@ Anyone is welcome to participate. :-)
 
 - Full test coverage:
 
-  - Equality check operation adheres to the semantics of equality described in the data structure
-    defintion.
+  - State equivalence - `a` and `b` have equivalent abstract states if all query operation return
+    the same value.
 
   - Update operations adheres to the semantics described in its definition. This should be asserted
     on the return values of the query operations.
