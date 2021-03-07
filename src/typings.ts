@@ -5,8 +5,8 @@
 export type CrdtAtom<Element = unknown> =
   | string
   | number
-  | Set<Element>
-  | Array<Element>
+  | ReadonlySet<Element>
+  | ReadonlyArray<Element>
   | null
   | undefined;
 
