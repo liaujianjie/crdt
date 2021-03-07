@@ -13,6 +13,8 @@ Anyone is welcome to participate. :-)
 - Naming of variables, classes, interfaces and other identifiers should adhere to the semantics
   described in the paper.
 
+- Develop a consistent structure for composing new CvRDTs from other CvRDTs.
+
 - Full test coverage:
 
   - State equivalence - `a` and `b` have equivalent abstract states if all query operation return
