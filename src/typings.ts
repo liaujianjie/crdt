@@ -25,10 +25,15 @@ export interface StateBasedCrdtReplica<Payload extends StateBasedCrdtPayload> {
  * Base immutatable data type type, identified by its literal content. Atoms can be copied between
  * processes; atoms are equal if they have the same content.
  */
-export type Atom<Element = unknown> =
+export type CrdtAtom<Element = unknown> =
   | string
   | number
   | Set<Element>
   | Array<Element>
   | null
   | undefined;
+
+export type CrdtObject<Identity, Payload> = {
+  id: Identity;
+  content: Payload;
+};

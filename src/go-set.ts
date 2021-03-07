@@ -1,20 +1,24 @@
-import { StateBasedCrdtPayload, StateBasedCrdtReplica, Atom } from './typings';
+import {
+  StateBasedCrdtPayload,
+  StateBasedCrdtReplica,
+  CrdtAtom,
+} from './typings';
 
-interface GOSetPayload<Element extends Atom> extends StateBasedCrdtPayload {
+interface GOSetPayload<Element extends CrdtAtom> extends StateBasedCrdtPayload {
   /**
    * Underlying set.
    */
   readonly set: Set<Element>;
 }
 
-interface GOSetQueryOps<Element extends Atom> {
+interface GOSetQueryOps<Element extends CrdtAtom> {
   /**
    * Returns `true` if the set contains `element`.
    */
   has(element: Element): boolean;
 }
 
-interface GOSetUpdateOps<Element extends Atom> {
+interface GOSetUpdateOps<Element extends CrdtAtom> {
   /**
    * Adds an element to the set.
    */
@@ -27,7 +31,7 @@ interface GOSetUpdateOps<Element extends Atom> {
  * Note: Yes, this one is kind of a no-brainer. I just wanted to see how it fits into the semantics
  *       of a CvRDT.
  */
-export class GOSet<Element extends Atom>
+export class GOSet<Element extends CrdtAtom>
   implements
     StateBasedCrdtReplica<GOSetPayload<Element>>,
     GOSetQueryOps<Element>,
