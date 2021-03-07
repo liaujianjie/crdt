@@ -21,4 +21,14 @@ export interface StateBasedCrdtReplica<Payload extends StateBasedCrdtPayload> {
   merge(otherPayload: Payload): void;
 }
 
-export type Primitive = string | number | null | undefined;
+/**
+ * Base immutatable data type type, identified by its literal content. Atoms can be copied between
+ * processes; atoms are equal if they have the same content.
+ */
+export type Atom<Element = unknown> =
+  | string
+  | number
+  | Set<Element>
+  | Array<Element>
+  | null
+  | undefined;

@@ -1,24 +1,20 @@
 import { GOSet } from './go-set';
-import {
-  StateBasedCrdtPayload,
-  StateBasedCrdtReplica,
-  Primitive,
-} from './typings';
+import { StateBasedCrdtPayload, StateBasedCrdtReplica, Atom } from './typings';
 
 /**
  * Set in which deleted elements are no longer re-addable.
  */
-interface TwoPhaseSetPayload<Element extends Primitive>
+interface TwoPhaseSetPayload<Element extends Atom>
   extends StateBasedCrdtPayload {
   readonly added: GOSet<Element>;
   readonly removed: GOSet<Element>;
 }
 
-interface TwoPhaseSetQueryOps<Element extends Primitive> {
+interface TwoPhaseSetQueryOps<Element extends Atom> {
   has(element: Element): boolean;
 }
 
-interface TwoPhaseSetUpdateOps<Element extends Primitive> {
+interface TwoPhaseSetUpdateOps<Element extends Atom> {
   /**
    * Adds an element to the set.
    */
@@ -29,7 +25,7 @@ interface TwoPhaseSetUpdateOps<Element extends Primitive> {
   remove(element: Element): void;
 }
 
-export class TwoPhaseSet<Element extends Primitive>
+export class TwoPhaseSet<Element extends Atom>
   implements
     StateBasedCrdtReplica<TwoPhaseSetPayload<Element>>,
     TwoPhaseSetPayload<Element>,

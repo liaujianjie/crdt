@@ -1,12 +1,7 @@
-import {
-  Primitive,
-  StateBasedCrdtPayload,
-  StateBasedCrdtReplica,
-} from './typings';
+import { Atom, StateBasedCrdtPayload, StateBasedCrdtReplica } from './typings';
 import { invariant } from './utils/invariant';
 
-interface LWWRegisterPayload<Value extends Primitive>
-  extends StateBasedCrdtPayload {
+interface LWWRegisterPayload<Value extends Atom> extends StateBasedCrdtPayload {
   /**
    * Data
    */
@@ -15,14 +10,14 @@ interface LWWRegisterPayload<Value extends Primitive>
   value: Value;
 }
 
-interface LWWRegisterQueryOps<Value extends Primitive> {
+interface LWWRegisterQueryOps<Value extends Atom> {
   /**
    * Returns the value of the register.
    */
   getValue(): Value;
 }
 
-interface LWWRegisterUpdateOps<Value extends Primitive> {
+interface LWWRegisterUpdateOps<Value extends Atom> {
   /**
    * Assgins a new value to the register.
    */
@@ -32,7 +27,7 @@ interface LWWRegisterUpdateOps<Value extends Primitive> {
 /**
  * Last-writer-wins register.
  */
-export class LWWRegister<Value extends Primitive>
+export class LWWRegister<Value extends Atom>
   implements
     StateBasedCrdtReplica<LWWRegisterPayload<Value>>,
     LWWRegisterQueryOps<Value>,
