@@ -1,10 +1,10 @@
 import {
   StateBasedCrdtPayload,
   StateBasedCrdtReplica,
-  PrimitiveType,
+  Primitive,
 } from './typings';
 
-interface GOSetPayload<Element extends PrimitiveType>
+interface GOSetPayload<Element extends Primitive>
   extends StateBasedCrdtPayload {
   /**
    * Underlying set.
@@ -12,14 +12,14 @@ interface GOSetPayload<Element extends PrimitiveType>
   readonly set: Set<Element>;
 }
 
-interface GOSetQueryOps<Element extends PrimitiveType> {
+interface GOSetQueryOps<Element extends Primitive> {
   /**
    * Returns `true` if the set contains `element`.
    */
   has(element: Element): boolean;
 }
 
-interface GOSetUpdateOps<Element extends PrimitiveType> {
+interface GOSetUpdateOps<Element extends Primitive> {
   /**
    * Adds an element to the set.
    */
@@ -32,7 +32,7 @@ interface GOSetUpdateOps<Element extends PrimitiveType> {
  * Note: Yes, this one is kind of a no-brainer. I just wanted to see how it fits into the semantics
  *       of a CvRDT.
  */
-export class GOSet<Element extends PrimitiveType>
+export class GOSet<Element extends Primitive>
   implements
     StateBasedCrdtReplica<GOSetPayload<Element>>,
     GOSetQueryOps<Element>,

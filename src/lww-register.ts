@@ -1,11 +1,11 @@
 import {
-  PrimitiveType,
+  Primitive,
   StateBasedCrdtPayload,
   StateBasedCrdtReplica,
 } from './typings';
 import { invariant } from './utils/invariant';
 
-interface LWWRegisterPayload<Value extends PrimitiveType>
+interface LWWRegisterPayload<Value extends Primitive>
   extends StateBasedCrdtPayload {
   /**
    * Data
@@ -15,14 +15,14 @@ interface LWWRegisterPayload<Value extends PrimitiveType>
   value: Value;
 }
 
-interface LWWRegisterQueryOps<Value extends PrimitiveType> {
+interface LWWRegisterQueryOps<Value extends Primitive> {
   /**
    * Returns the value of the register.
    */
   getValue(): Value;
 }
 
-interface LWWRegisterUpdateOps<Value extends PrimitiveType> {
+interface LWWRegisterUpdateOps<Value extends Primitive> {
   /**
    * Assgins a new value to the register.
    */
@@ -32,7 +32,7 @@ interface LWWRegisterUpdateOps<Value extends PrimitiveType> {
 /**
  * Last-writer-wins register.
  */
-export class LWWRegister<Value extends PrimitiveType>
+export class LWWRegister<Value extends Primitive>
   implements
     StateBasedCrdtReplica<LWWRegisterPayload<Value>>,
     LWWRegisterQueryOps<Value>,
