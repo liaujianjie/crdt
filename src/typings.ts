@@ -1,27 +1,4 @@
 /**
- * Payload for a CvRDT system. The payload is sent between replicas.
- */
-export interface StateBasedCrdtPayload {}
-
-/**
- * Replica for a CvRDT system.
- */
-export interface StateBasedCrdtReplica<Payload extends StateBasedCrdtPayload> {
-  /**
-   * Node that controls the replica.
-   */
-  readonly replicaId: string;
-  /**
-   * Returns `true` if `otherPayload` is equals to the payload from `this` replica.
-   */
-  hasEqualPayload(otherPayload: Payload): boolean;
-  /**
-   * Merges the payload from another replica to the payload from `this` replica.
-   */
-  merge(otherPayload: Payload): void;
-}
-
-/**
  * Base immutatable data type type, identified by its literal content. Atoms can be copied between
  * processes; atoms are equal if they have the same content.
  */
@@ -33,12 +10,25 @@ export type CrdtAtom<Element = unknown> =
   | null
   | undefined;
 
-export type CrdtObject<Identity, Payload> = {
-  identity: Identity;
-  payload: Payload;
-};
+/**
+ * Mutable, replicatable data type.
+ */
+export interface CrdtPayload<Content> {
+  /**
+   * Unique identifier of the object. An object with the same identity may be in more than one
+   * process, in which case we call these objects _replicas_.
+   */
+  id: string;
+  /**
+   * Underlying serializable data that represents the CRDT object state.
+   */
+  content: Content;
+}
 
-export type CrdtProcess<Identity, Payload> = {
+/**
+ * A node in a network of processes.
+ */
+export interface CrdtProcess<Content> {
   /**
    * Globally unique identifier to uniquely identity the process in a network of processes.
    */
@@ -46,5 +36,23 @@ export type CrdtProcess<Identity, Payload> = {
   /**
    * Local replica of the CRDT.
    */
-  replica: CrdtObject<Identity, Payload>;
-};
+  replica: CrdtPayload<Content>;
+}
+
+/**
+ * Base specification for a **CvRDT**. Concrete specifications should also implement the update and
+ * query operations, including their precondition checks.
+ */
+export interface CvrdtSpecification<Payload extends CrdtPayload<unknown>> {
+  // Payload is not included.
+
+  /**
+   * Returns `true` if payloads `a` and `b` have equivalent abstract states.
+   */
+  compare(a: Payload, b: Payload): boolean;
+
+  /**
+   * Merges payloads `a` and `b` and returns a least upper bound payload.
+   */
+  merge(a: Payload, b: Payload): Payload;
+}
