@@ -1,14 +1,13 @@
+export type Primitive = string | number | null | undefined;
+
 /**
  * Base immutatable data type type, identified by its literal content. Atoms can be copied between
  * processes; atoms are equal if they have the same content.
  */
-export type CrdtAtom<Element = unknown> =
-  | string
-  | number
+export type CrdtAtom<Element extends unknown = unknown> =
+  | Primitive
   | ReadonlySet<Element>
-  | ReadonlyArray<Element>
-  | null
-  | undefined;
+  | ReadonlyArray<Element>;
 
 /**
  * Mutable, replicatable data type.
