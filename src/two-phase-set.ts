@@ -76,11 +76,6 @@ export const TwoPhaseSetUtils: TwoPhaseSetUtils = {
   },
 
   remove(payload, element) {
-    invariant(
-      GrowOnlySetUtils.has(payload.content.added, element),
-      "Cannot remove element that hasn't been added yet."
-    );
-
     return {
       id: payload.id,
       content: {

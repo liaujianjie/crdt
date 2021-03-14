@@ -102,9 +102,9 @@ describe('two-phase-set', () => {
       expect(has(add(a, 'meow'), 'meow')).toBe(true);
     });
 
-    it('should not add element if it has been removed before', () => {
+    it('should be equal when adding an already-removed element', () => {
       const a = remove(add(getInitialPayload('payload_x'), 'meow'), 'meow');
-      expect(has(add(a, 'meow'), 'meow')).toBe(false);
+      expect(compare(a, remove(a, 'meow'))).toBe(true);
     });
 
     it('should be equal when adding an already-added element', () => {
@@ -114,14 +114,15 @@ describe('two-phase-set', () => {
   });
 
   describe(TwoPhaseSetUtils.remove, () => {
-    it('should throw if element has not been added yet', () => {
-      const a = getInitialPayload('payload_x');
-      expect(() => remove(a, 'meow')).toThrow();
-    });
-
     it('should remove element', () => {
       const a = add(getInitialPayload('payload_x'), 'meow');
       expect(has(remove(a, 'meow'), 'meow')).toBe(false);
+    });
+
+    it('should remove even if element has not been added yet', () => {
+      const a = getInitialPayload('payload_x');
+      expect(has(remove(a, 'meow'), 'meow')).toBe(false);
+      expect(has(add(remove(a, 'meow'), 'meow'), 'meow')).toBe(false);
     });
 
     it('should be equal when removing an already-removed element', () => {
