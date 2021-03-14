@@ -95,9 +95,8 @@ export const GrowOnlyCounterUtils: GrowOnlyCounterUtils = {
   },
 
   getValue(payload) {
-    return Object.keys(payload.content).reduce(
-      (previousValue, processId) => previousValue + payload.content[processId],
-      0
-    );
+    return Object.keys(payload.content).reduce((previousValue, processId) => {
+      return previousValue + (payload.content[processId] ?? 0);
+    }, 0);
   },
 };
